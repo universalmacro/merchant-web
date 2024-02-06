@@ -7,18 +7,12 @@ import { AppDispatch } from "../../store";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import {
   Button,
-  Cascader,
-  Checkbox,
-  ColorPicker,
   DatePicker,
   Form,
   Input,
   InputNumber,
-  Radio,
   Select,
-  Slider,
   Switch,
-  TreeSelect,
   Upload,
   message,
 } from "antd";
