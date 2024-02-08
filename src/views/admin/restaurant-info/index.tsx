@@ -6,7 +6,7 @@ import { toTimestamp } from "../../../utils/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Form, Input } from "antd";
 import { AppDispatch } from "../../../store";
-import { getRestaurantInfo } from "../../../features/restaurant/restaurantActions";
+import { getSpaceList } from "../../../features/space/spaceActions";
 import ConfirmModalForm from "components/confirm-modal-form";
 
 type FieldType = {
@@ -17,7 +17,7 @@ type FieldType = {
 const Tables = () => {
   const [dataSource, setDataSource] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { userToken } =
+  const { userToken, basePath } =
     useSelector((state: any) => state.auth) || localStorage.getItem("merchant-web-token") || {};
   const { restaurantList, restaurantId, restaurantInfo } =
     useSelector((state: any) => state.restaurant) || {};
@@ -45,7 +45,7 @@ const Tables = () => {
           headers: getHeaders(),
         });
         successCallback();
-        dispatch(getRestaurantInfo({ token: userToken }));
+        dispatch(getSpaceList({ token: userToken, url: basePath }));
       } catch (e) {}
     }
   };
@@ -72,7 +72,7 @@ const Tables = () => {
       );
       if (res) {
         successCallback();
-        dispatch(getRestaurantInfo({ token: userToken }));
+        dispatch(getSpaceList({ token: userToken, url: basePath }));
         newForm.setFieldsValue({ name: "", description: "" });
       }
     } catch (e) {}
@@ -90,7 +90,7 @@ const Tables = () => {
       );
       if (res) {
         successCallback();
-        dispatch(getRestaurantInfo({ token: userToken }));
+        dispatch(getSpaceList({ token: userToken, url: basePath }));
       }
     } catch (e) {}
   };

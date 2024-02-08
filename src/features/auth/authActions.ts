@@ -25,7 +25,7 @@ export const userLogin = createAsyncThunk(
         if(data?.token){
 				  localStorage.setItem('merchant-web-token', data.token);
 			  }
-      return { ...data};
+      return { ...data, basePath: url};
       }
 		} catch (error: any) {
 			// return custom error message from API if any
@@ -38,6 +38,30 @@ export const userLogin = createAsyncThunk(
 	}
 );
 
+export const userBasePath = createAsyncThunk(
+	'auth/url',
+	async ({ }: any, { rejectWithValue }) => {
+    let host = window.location.host;
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      // localhost 測試環境發送請求會報錯
+      host = 'uat.uat-hongkong-1-merchant.universalmacro.com';
+    } 
+		try {
+      const res = await axios.get(`${basePath}/nodes/config/api?domain=${host}`);
+      if(res && res?.data){
+        let url = res?.data?.merchantUrl;
+        return { basePath: url};
+      }
+		} catch (error: any) {
+			// return custom error message from API if any
+			if (error.response && error.response.data.message) {
+				return rejectWithValue(error.response.data.message);
+			} else {
+				return rejectWithValue(error.message);
+			}
+		}
+	}
+);
 
 export const userInfoAuth = createAsyncThunk(
 	'auth/info',

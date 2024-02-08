@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RiAddFill } from "react-icons/ri";
 import ModalForm from "../../../components/modal-form";
 import { AppDispatch } from "../../../store";
-import { getRestaurantInfo } from "../../../features/restaurant/restaurantActions";
+import { getSpaceList } from "../../../features/space/spaceActions";
 import { defaultImage } from "../../../utils/constant";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -70,7 +70,7 @@ const Tables = () => {
           headers: getHeaders(),
         }
       );
-      dispatch(getRestaurantInfo({ token: userToken }));
+      // dispatch(getRestaurantInfo({ token: userToken }));
     } catch (e) {}
     setVisible(false);
   };
@@ -85,7 +85,7 @@ const Tables = () => {
           headers: getHeaders(),
         }
       );
-      dispatch(getRestaurantInfo({ token: userToken }));
+      // dispatch(getRestaurantInfo({ token: userToken }));
     } catch (e) {}
     setVisible(false);
   };
@@ -96,7 +96,7 @@ const Tables = () => {
         const res = await deleteItems(record.id, {
           headers: getHeaders(),
         });
-        dispatch(getRestaurantInfo({ token: userToken }));
+        // dispatch(getRestaurantInfo({ token: userToken }));
 
         console.log("handleDelete", res);
       } catch (e) {}
