@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './features/auth/authSlice';
-import restaurantReducer from './features/restaurant/restaurantSlice';
+import spaceReducer from './features/space/spaceSlice';
 
 
 const store = configureStore({
   reducer: {
     auth: authReducer,
-    restaurant: restaurantReducer
+    space: spaceReducer
   }
 })
 

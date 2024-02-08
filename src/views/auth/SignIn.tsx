@@ -18,7 +18,7 @@ const SignIn = () => {
 
   // redirect authenticated user to profile screen
   useEffect(() => {
-    if (userToken) {
+    if (userToken && !error) {
       navigate("/admin/manage");
     }
   }, [navigate, userToken]);
