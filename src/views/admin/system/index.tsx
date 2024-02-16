@@ -26,10 +26,10 @@ const Tables = () => {
   const [dataSource, setDataSource] = useState([]);
   const { userToken, basePath } =
     useSelector((state: any) => state.auth) || localStorage.getItem("merchant-web-token") || {};
-  const { restaurantList, restaurantId, restaurantInfo } =
-    useSelector((state: any) => state.restaurant) || {};
   const [merchantApi, setMerchantApi] = useState(null);
   const [spaceApi, setSpaceApi] = useState(null);
+  const { confirm } = Modal;
+  const [spaceValue, setSpaceValue] = useState({ name: "", description: "", id: "" });
 
   useEffect(() => {
     if (basePath && !spaceApi) {
@@ -80,6 +80,30 @@ const Tables = () => {
     });
   };
 
+  const handleDelete = (record: any) => {
+    showDeleteConfirm(async () => {
+      try {
+        const res = await spaceApi?.deleteSpace({ id: record?.id });
+        getSpaceList(paginationConfig?.page, paginationConfig?.pageSize);
+      } catch (e) {
+        errorCallback(e);
+      }
+    });
+  };
+
+  const showDeleteConfirm = (onOk: any) => {
+    confirm({
+      title: "確認刪除？",
+      okText: "確認",
+      okType: "danger",
+      cancelText: "取消",
+      onOk,
+      onCancel() {
+        console.log("OK");
+      },
+    });
+  };
+
   const onSave = async (values: any) => {
     console.log("onsave", values);
     try {
@@ -93,6 +117,26 @@ const Tables = () => {
       getSpaceList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}
     setVisible(false);
+  };
+
+  const onUpdate = async (values: any) => {
+    console.log(values);
+    try {
+      const res = await spaceApi.updateSpace({
+        id: values.id,
+        saveSpaceRequest: {
+          name: values?.name,
+          description: values?.description ?? "",
+        },
+      });
+      getSpaceList(paginationConfig?.page, paginationConfig?.pageSize);
+    } catch (e) {}
+    setVisible(false);
+  };
+
+  const editSpace = (record: any) => {
+    setSpaceValue({ name: record.name, description: record.description, id: record.id });
+    setVisible(true);
   };
 
   const onOk = (value: DatePickerProps["value"] | RangePickerProps["value"]) => {
@@ -117,6 +161,27 @@ const Tables = () => {
       key: "description",
       width: "16%",
     },
+    {
+      title: "操作",
+      key: "operation",
+      width: "20%",
+      render: (text: any, record: any) => (
+        <>
+          <span onClick={() => editSpace(record)} className="mr-4 text-blue-400">
+            編輯
+          </span>
+          <span
+            className="mr-4 cursor-pointer text-red-400"
+            onClick={(e: any) => {
+              e.stopPropagation();
+              handleDelete(record);
+            }}
+          >
+            刪除
+          </span>
+        </>
+      ),
+    },
   ];
 
   const addSpace = () => {
@@ -126,9 +191,9 @@ const Tables = () => {
   return (
     <div>
       <ModalForm
-        state={formValues}
+        state={spaceValue}
         visible={visible}
-        onSave={onSave}
+        onSave={spaceValue?.name == "" ? onSave : onUpdate}
         onCancel={() => {
           setVisible(false);
         }}

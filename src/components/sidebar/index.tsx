@@ -27,7 +27,7 @@ const Sidebar = (props: { open: boolean; onClose: React.MouseEventHandler<HTMLSp
       {/* Nav item */}
 
       <ul className="mb-auto pt-1">
-        <Links routes={routes} />
+        <Links routes={routes?.filter((item: any) => item?.hidden !== true)} />
       </ul>
 
       {/* Free Horizon Card
