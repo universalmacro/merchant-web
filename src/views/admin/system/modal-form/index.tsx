@@ -30,7 +30,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onSave({ ...values });
+            onSave({ ...values, id: state.id });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
