@@ -3,8 +3,9 @@ import { restaurantApi, getBillList } from "api";
 import { Table, Tag, Badge, DatePicker, Space, Modal } from "antd";
 import type { DatePickerProps, RangePickerProps } from "antd/es/date-picker";
 import { toTimestamp } from "../../../utils/utils";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import ModalForm from "./modal-form";
+import { useNavigate } from "react-router-dom";
 
 import {
   Configuration as MerchantConfig,
@@ -20,6 +21,8 @@ const paginationConfig = {
 const { RangePicker } = DatePicker;
 
 const Tables = () => {
+  const navigate = useNavigate();
+
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({});
@@ -167,7 +170,16 @@ const Tables = () => {
       width: "20%",
       render: (text: any, record: any) => (
         <>
-          <span onClick={() => editSpace(record)} className="mr-4 text-blue-400">
+          <span
+            className="mr-4 cursor-pointer text-blue-400"
+            onClick={(e: any) => {
+              e.stopPropagation();
+              navigate(`/spaces/${record?.id}/order/table`);
+            }}
+          >
+            配置
+          </span>
+          <span onClick={() => editSpace(record)} className="mr-4 cursor-pointer text-blue-400">
             編輯
           </span>
           <span

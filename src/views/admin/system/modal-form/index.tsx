@@ -44,7 +44,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
           rules={[
             {
               required: true,
-              message: "請輸入空z間名稱",
+              message: "請輸入空間名稱",
             },
           ]}
         >

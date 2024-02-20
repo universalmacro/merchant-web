@@ -48,6 +48,7 @@ export const userBasePath = createAsyncThunk(
     } 
 		try {
       const res = await axios.get(`${basePath}/nodes/config/api?domain=${host}`);
+	  console.log("<<<<<<<<<<<<<<<<<<<<<<userBasePath:", res);
       if(res && res?.data){
         let url = res?.data?.merchantUrl;
         return { basePath: url};
