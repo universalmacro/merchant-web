@@ -16,7 +16,7 @@ const items3: MenuProps["items"] = spaceRoutes.map((item, index) => {
     label: item.name,
 
     children: item?.children?.map((_, j) => {
-      const subKey = _.name;
+      const subKey = _.path;
       return {
         key: subKey,
         label: _.name,
@@ -38,6 +38,8 @@ export default function Config(props: { [x: string]: any }) {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("table");
+  const [currentRouteName, setCurrentRouteName] = React.useState("餐桌");
+
   const { id } = useParams();
 
   const onClickMenu = (route: any) => {
@@ -72,7 +74,8 @@ export default function Config(props: { [x: string]: any }) {
             window.location.href.indexOf(routes[i].layout + "/" + id + subPath + routes[i].path) !==
             -1
           ) {
-            setCurrentRoute(routes[i].name);
+            setCurrentRoute(routes[i].path);
+            setCurrentRouteName(routes[i].name);
           }
         }
       }
@@ -156,7 +159,7 @@ export default function Config(props: { [x: string]: any }) {
           </Header>
           <Breadcrumb style={{ margin: "16px" }}>
             <Breadcrumb.Item href="/admin/nodes">配置</Breadcrumb.Item>
-            <Breadcrumb.Item>{currentRoute}</Breadcrumb.Item>
+            <Breadcrumb.Item>{currentRouteName}</Breadcrumb.Item>
           </Breadcrumb>
           <Content
             style={{

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Table, Button, Modal } from "antd";
+import { Table, Button, Modal, message } from "antd";
 import { RiAddFill } from "react-icons/ri";
 import ModalForm from "./modal-form";
 import { useParams, useNavigate } from "react-router-dom";
@@ -33,6 +33,7 @@ const Tables = () => {
   const navigate = useNavigate();
   const { userToken, basePath } =
     useSelector((state: any) => state.auth) || localStorage.getItem("merchant-web-token") || {};
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,7 +66,7 @@ const Tables = () => {
         requestBody: categorylist,
       });
       getCategoryList(paginationConfig?.page, paginationConfig?.pageSize);
-      successCallback("更新成功");
+      updateSuccess();
     } catch (e) {}
   };
 
@@ -120,9 +121,10 @@ const Tables = () => {
     });
   };
 
-  const errorCallback = (e: any) => {
-    Modal.error({
-      content: `${e}`,
+  const updateSuccess = () => {
+    messageApi.open({
+      type: "success",
+      content: "更新成功",
     });
   };
 
@@ -206,6 +208,7 @@ const Tables = () => {
 
   return (
     <div>
+      {contextHolder}
       <ModalForm
         state={tableValue}
         visible={visible}
