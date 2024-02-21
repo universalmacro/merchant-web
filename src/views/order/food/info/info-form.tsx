@@ -8,10 +8,10 @@ import type { UploadChangeParam } from "antd/es/upload";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import axios from "axios";
 
-const InfoForm = ({ record, state, visible, onSave, onCancel }: any) => {
+const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }: any) => {
   const [form] = Form.useForm();
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [category, setCategory] = useState([]);
+  // const [categoryOptions, setCategoryOptions] = useState([]);
+  // const [category, setCategory] = useState([]);
   const { userToken, basePath } =
     useSelector((state: any) => state.auth) || localStorage.getItem("userToken") || {};
   const navigate = useNavigate();
@@ -243,7 +243,7 @@ const InfoForm = ({ record, state, visible, onSave, onCancel }: any) => {
               optionFilterProp="children"
               // onSearch={onSearch}
               filterOption={filterOption}
-              options={categoryOptions}
+              options={categoryOptions ?? []}
             />
           </Form.Item>
 
