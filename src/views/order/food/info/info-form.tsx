@@ -138,6 +138,7 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
       const values = await form.validateFields();
       let params = {
         ...values,
+        categories: [values?.categories],
         description: values?.description ?? "",
         status:
           values.status === true || values.status === "AVAILABLE" ? "AVAILABLE" : "UNAVAILABLE",
@@ -237,7 +238,7 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
             rules={[{ required: true, message: "請輸入分類" }]}
           >
             <Select
-              mode="tags"
+              // mode="tags"
               showSearch
               placeholder="輸入分類"
               optionFilterProp="children"

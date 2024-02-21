@@ -32,14 +32,6 @@ input:checked.defaultCheckbox::before {
   background-color: #365486;
 }
 
-.ant-switch-inner {
-  /* background-color: #365486; */
-}
-
-.ant-table-placeholder {
-  z-index: 999 !important;
-}
-
 /* button:where(:not([class^="ant"])),
 [type='button']:where(:not([class^="ant"])),
 [type='reset']:where(:not([class^="ant"])),

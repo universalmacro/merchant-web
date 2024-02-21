@@ -64,7 +64,7 @@ const spaceRoutes: Array<{
     key: "order",
     children: [
       {
-        name: "table",
+        name: "餐桌",
         layout: "/spaces",
         icon: <TableOutlined />,
         path: "table",
@@ -72,7 +72,7 @@ const spaceRoutes: Array<{
         secondary: true,
       },
       {
-        name: "food",
+        name: "品項",
         layout: "/spaces",
         icon: <TableOutlined />,
         path: "food",
@@ -80,7 +80,7 @@ const spaceRoutes: Array<{
         secondary: true,
       },
       {
-        name: "category",
+        name: "分類",
         layout: "/spaces",
         icon: <AppstoreOutlined />,
         path: "category",
