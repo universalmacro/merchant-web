@@ -26,7 +26,7 @@ const Tables = () => {
   const [tableList, setFoodList] = useState([]);
   const [orderApi, setOrderApi] = useState(null);
   const [tagFilters, setTagFilters] = useState([]);
-
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const { confirm } = Modal;
 
   useEffect(() => {
@@ -50,6 +50,7 @@ const Tables = () => {
     }
     if (orderApi && basePath && userToken) {
       getFoodList(paginationConfig?.page, paginationConfig?.pageSize);
+      getCategoryList();
     }
   }, [userToken, basePath, orderApi]);
 
@@ -72,6 +73,30 @@ const Tables = () => {
       });
       setTagFilters(filters);
 
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
+  };
+
+  const getCategoryList = async () => {
+    setLoading(true);
+    try {
+      const res = await orderApi?.listFoodCategories({ id: id });
+      if (res?.length > 0) {
+        let data = res?.map((item: string, index: number) => {
+          return {
+            key: index,
+            name: item,
+          };
+        });
+        let options: any = [];
+        res?.map((e: any) => {
+          options.push({ value: e, label: e });
+        });
+        console.log(options);
+        setCategoryOptions(options);
+      }
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -317,6 +342,7 @@ const Tables = () => {
   return (
     <div>
       <ModalForm
+        categoryOptions={categoryOptions}
         state={foodValue}
         visible={visible}
         onSave={foodValue == null ? onCreate : onUpdate}

@@ -7,6 +7,7 @@ import NodeTables from "views/admin/nodes";
 import Profile from "views/admin/profile";
 import SpaceTable from "views/order/tables";
 import SpaceFood from "views/order/food";
+import SpaceCategory from "views/order/category";
 
 // Auth Imports
 import SignIn from "views/auth/SignIn";
@@ -16,7 +17,12 @@ import { MdBarChart, MdLock, MdPeopleAlt } from "react-icons/md";
 import { FaShareNodes } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 
-import { LaptopOutlined, ProfileOutlined, TableOutlined } from "@ant-design/icons";
+import {
+  LaptopOutlined,
+  ProfileOutlined,
+  TableOutlined,
+  AppstoreOutlined,
+} from "@ant-design/icons";
 
 const routes = [
   {
@@ -71,6 +77,14 @@ const spaceRoutes: Array<{
         icon: <TableOutlined />,
         path: "food",
         component: <SpaceFood />,
+        secondary: true,
+      },
+      {
+        name: "category",
+        layout: "/spaces",
+        icon: <AppstoreOutlined />,
+        path: "category",
+        component: <SpaceCategory />,
         secondary: true,
       },
     ],
