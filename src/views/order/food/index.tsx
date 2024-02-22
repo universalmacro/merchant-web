@@ -5,9 +5,15 @@ import { Table, Button, Modal, Tag } from "antd";
 import ModalForm from "./info/info-form";
 
 import { useParams, useNavigate } from "react-router-dom";
-import { OrderApi, Configuration, ConfigurationParameters } from "@universalmacro/merchant-ts-sdk";
+import {
+  OrderApi,
+  SpaceApi,
+  Configuration,
+  ConfigurationParameters,
+} from "@universalmacro/merchant-ts-sdk";
 import { CommonTable } from "@macro-components/common-components";
 import { defaultImage } from "../../../utils/constant";
+import PrinterModalForm from "./printer-modal-form";
 
 const paginationConfig = {
   pageSize: 10,
@@ -21,12 +27,17 @@ const Tables = () => {
     useSelector((state: any) => state.auth) || localStorage.getItem("merchant-web-token") || {};
 
   const [visible, setVisible] = useState(false);
+  const [printerVisible, setPrinterVisible] = useState(false);
+  const [printerValue, setPrinterValue] = useState(null);
   const [loading, setLoading] = useState(false);
   const [foodValue, setFoodValue] = useState(null);
   const [tableList, setFoodList] = useState([]);
   const [orderApi, setOrderApi] = useState(null);
   const [tagFilters, setTagFilters] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [printerOptions, setPrinterOptions] = useState([]);
+  const [spaceApi, setSpaceApi] = useState(null);
+
   const { confirm } = Modal;
 
   useEffect(() => {
@@ -48,9 +59,22 @@ const Tables = () => {
         )
       );
     }
+    if (!spaceApi && basePath) {
+      setSpaceApi(
+        new SpaceApi(
+          new Configuration({
+            basePath: basePath,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          } as ConfigurationParameters)
+        )
+      );
+    }
     if (orderApi && basePath && userToken) {
       getFoodList(paginationConfig?.page, paginationConfig?.pageSize);
       getCategoryList();
+      getPrinterList();
     }
   }, [userToken, basePath, orderApi]);
 
@@ -103,6 +127,20 @@ const Tables = () => {
     }
   };
 
+  const getPrinterList = async () => {
+    try {
+      const res = await spaceApi?.listPrinters({ id: id });
+      if (res?.length > 0) {
+        let options: any = [];
+        res?.map((e: any) => {
+          options.push({ value: e?.id, label: e?.name, ...e });
+        });
+        console.log(res, options);
+        setPrinterOptions(options);
+      }
+    } catch (e) {}
+  };
+
   const successCallback = () => {
     Modal.success({
       content: "創建成功！",
@@ -145,6 +183,19 @@ const Tables = () => {
     setVisible(false);
   };
 
+  const onUpdatePrinter = async (values: any) => {
+    console.log("onUpdate", values);
+    try {
+      const res = await orderApi.updateFoodPrinters({
+        id: values.id,
+        requestBody: {
+          ...values,
+        },
+      });
+    } catch (e) {}
+    setPrinterVisible(false);
+  };
+
   const showDeleteConfirm = (onOk: any) => {
     confirm({
       title: "確認刪除？",
@@ -166,6 +217,27 @@ const Tables = () => {
   const editFood = (record: any) => {
     setFoodValue(record);
     setVisible(true);
+  };
+
+  const editPrinter = async (record: any) => {
+    setPrinterVisible(true);
+    try {
+      const res = await orderApi?.listFoodPrinters({ id: record?.id });
+      if (res) {
+        let data = res?.map((item: string, index: number) => {
+          return {
+            key: index,
+            name: item,
+          };
+        });
+        let options: any = [];
+        res?.map((e: any) => {
+          options.push({ value: e, label: e });
+        });
+        console.log(options);
+        setPrinterValue({ id: record?.id, printers: options });
+      }
+    } catch (e) {}
   };
 
   const handleDelete = (record: any) => {
@@ -331,8 +403,11 @@ const Tables = () => {
           <span className="mr-4 cursor-pointer text-blue-400" onClick={() => editFood(record)}>
             編輯
           </span>
-          <span className="cursor-pointer text-red-400" onClick={() => handleDelete(record)}>
+          <span className="mr-4 cursor-pointer text-red-400" onClick={() => handleDelete(record)}>
             刪除
+          </span>
+          <span className="mr-4 cursor-pointer text-blue-400" onClick={() => editPrinter(record)}>
+            打印機
           </span>
         </>
       ),
@@ -348,6 +423,15 @@ const Tables = () => {
         onSave={foodValue == null ? onCreate : onUpdate}
         onCancel={() => {
           setVisible(false);
+        }}
+      />
+      <PrinterModalForm
+        printerOptions={printerOptions}
+        state={printerValue}
+        visible={printerVisible}
+        onSave={onUpdatePrinter}
+        onCancel={() => {
+          setPrinterVisible(false);
         }}
       />
       <div className="mt-5 grid h-full grid-cols-1 gap-5">

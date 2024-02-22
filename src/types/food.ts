@@ -1,4 +1,4 @@
-export interface RestaurantTable {
+export interface SpaceTable {
   id: string;
   label: string;
 };
@@ -14,6 +14,6 @@ export interface Printer {
   name: string;
   sn: string;
   description: string;
-  type: string;
-  model: '58mm' | '88mm';
+  type: 'KITCHEN' | 'CASHIER' ;
+  model: 'F58MM' | 'F80MM';
 };
