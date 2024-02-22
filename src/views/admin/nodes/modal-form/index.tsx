@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Modal, Form, Input } from "antd";
-import { RestaurantTable } from "types/restaurant";
 
 interface ModalFormProps {
   state: any;

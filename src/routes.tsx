@@ -8,6 +8,7 @@ import Profile from "views/admin/profile";
 import SpaceTable from "views/order/tables";
 import SpaceFood from "views/order/food";
 import SpaceCategory from "views/order/category";
+import SpacePrinter from "views/order/printer";
 
 // Auth Imports
 import SignIn from "views/auth/SignIn";
@@ -22,6 +23,7 @@ import {
   ProfileOutlined,
   TableOutlined,
   AppstoreOutlined,
+  PrinterOutlined,
 } from "@ant-design/icons";
 
 const routes = [
@@ -85,6 +87,14 @@ const spaceRoutes: Array<{
         icon: <AppstoreOutlined />,
         path: "category",
         component: <SpaceCategory />,
+        secondary: true,
+      },
+      {
+        name: "打印機",
+        layout: "/spaces",
+        icon: <PrinterOutlined />,
+        path: "printer",
+        component: <SpacePrinter />,
         secondary: true,
       },
     ],

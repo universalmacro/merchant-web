@@ -1,28 +1,34 @@
 import { useEffect } from "react";
-import { Modal, Form, Input } from "antd";
-import { SpaceTable } from "types/food";
+import { Modal, Form, Select } from "antd";
 
 interface TableModalFormProps {
-  state: SpaceTable;
+  state: any;
   visible: boolean;
-  onSave: (table: SpaceTable) => void;
+  onSave: (value: any) => void;
   onCancel: () => void;
+  printerOptions: any;
 }
 
-const ModalForm: React.FC<TableModalFormProps> = ({ state, visible, onSave, onCancel }) => {
+const PrinterModalForm: React.FC<TableModalFormProps> = ({
+  state,
+  visible,
+  onSave,
+  onCancel,
+  printerOptions,
+}) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
     form.setFieldsValue({
-      label: state.label,
-      id: state.id,
+      printers: state?.printers,
+      id: state?.id,
     });
   }, [state?.id]);
 
   return (
     <Modal
       open={visible}
-      title="新增/编辑餐桌"
+      title="新增/编辑打印機"
       okText="確認"
       cancelText="取消"
       onCancel={onCancel}
@@ -39,21 +45,18 @@ const ModalForm: React.FC<TableModalFormProps> = ({ state, visible, onSave, onCa
       }}
     >
       <Form form={form} layout="vertical" name="form_in_modal">
-        <Form.Item
-          name="label"
-          label="餐桌名稱"
-          rules={[
-            {
-              required: true,
-              message: "請輸入餐廳名稱",
-            },
-          ]}
-        >
-          <Input />
+        <Form.Item name="printers" label="打印機">
+          <Select
+            mode="multiple"
+            allowClear
+            style={{ width: "100%" }}
+            placeholder="請選擇打印機"
+            options={printerOptions}
+          />
         </Form.Item>
       </Form>
     </Modal>
   );
 };
 
-export default ModalForm;
+export default PrinterModalForm;
