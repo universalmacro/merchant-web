@@ -188,9 +188,7 @@ const Tables = () => {
     try {
       const res = await orderApi.updateFoodPrinters({
         id: values.id,
-        requestBody:
-          // ...values,
-          ["1755585588037156864"],
+        requestBody: [...values],
       });
     } catch (e) {}
     setPrinterVisible(false);
