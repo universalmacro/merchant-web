@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { CloseOutlined } from '@ant-design/icons';
-import { Button, Card, Form, Input, InputNumber, Space, Typography } from 'antd';
+import React, { useEffect, useState } from "react";
+import { CloseOutlined } from "@ant-design/icons";
+import { Button, Card, Form, Input, InputNumber, Space, Typography } from "antd";
 
 const EditAttribute = ({ initValues, onChange }: any) => {
   const [form] = Form.useForm();
@@ -13,10 +13,9 @@ const EditAttribute = ({ initValues, onChange }: any) => {
 
   useEffect(() => form.resetFields(), [initValues]);
 
-
   const onFormChange = () => {
     onChange(form.getFieldsValue()?.items);
-  }
+  };
 
   return (
     <Form
@@ -31,7 +30,7 @@ const EditAttribute = ({ initValues, onChange }: any) => {
     >
       <Form.List name="items">
         {(fields, { add, remove }) => (
-          <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
+          <div style={{ display: "flex", rowGap: 16, flexDirection: "column" }}>
             {fields.map((field) => (
               <Card
                 size="small"
@@ -45,22 +44,22 @@ const EditAttribute = ({ initValues, onChange }: any) => {
                   />
                 }
               >
-                <Form.Item label="屬性名稱" name={[field.name, 'label']}>
+                <Form.Item label="屬性名稱" name={[field.name, "label"]}>
                   <Input />
                 </Form.Item>
 
                 {/* Nest Form.List */}
-                <Form.Item label="屬性詳情">
-                  <Form.List name={[field.name, 'options']}>
+                <Form.Item label="選項">
+                  <Form.List name={[field.name, "options"]}>
                     {(subFields, subOpt) => (
-                      <div style={{ display: 'flex', flexDirection: 'column', rowGap: 16 }}>
+                      <div style={{ display: "flex", flexDirection: "column", rowGap: 16 }}>
                         {subFields.map((subField) => (
                           <Space key={subField.key}>
-                            <Form.Item noStyle name={[subField.name, 'label']}>
+                            <Form.Item noStyle name={[subField.name, "label"]}>
                               <Input placeholder="標籤" />
                             </Form.Item>
-                            <Form.Item noStyle name={[subField.name, 'extra']}>
-                              <InputNumber placeholder="額外價錢" />
+                            <Form.Item noStyle name={[subField.name, "extra"]}>
+                              <InputNumber placeholder="額外價格" />
                             </Form.Item>
                             <CloseOutlined
                               onClick={() => {

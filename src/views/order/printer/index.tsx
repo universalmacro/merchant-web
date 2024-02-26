@@ -72,16 +72,7 @@ const Tables = () => {
     setLoading(true);
     try {
       const res = await spaceApi?.listPrinters({ id: id });
-      // if (res?.length > 0) {
-      //   let data = res?.map((item: string, index: number) => {
-      //     return {
-      //       key: index,
-      //       name: item,
-      //     };
-      //   });
-      // }
       setPrinterList(res ?? []);
-
       setLoading(false);
     } catch (e) {
       setLoading(false);
