@@ -65,11 +65,6 @@ export default function Config(props: { [x: string]: any }) {
       } else {
         let routes = routesConfig?.[j].children;
         for (let i = 0; i < routes?.length; i++) {
-          console.log(
-            "=================================",
-            window.location.href,
-            routes[i].layout + "/" + id + subPath + routes[i].path
-          );
           if (
             window.location.href.indexOf(routes[i].layout + "/" + id + subPath + routes[i].path) !==
             -1

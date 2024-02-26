@@ -10,6 +10,7 @@ import {
   ConfigurationParameters,
   SpaceApi,
 } from "@universalmacro/merchant-ts-sdk";
+import axios from "axios";
 
 const paginationConfig = {
   pageSize: 10,
@@ -66,13 +67,20 @@ const Tables = () => {
     if (orderApi && basePath && userToken) {
       getPrinterList(paginationConfig?.page, paginationConfig?.pageSize);
     }
-  }, [userToken, basePath, orderApi]);
+  }, [userToken, basePath, orderApi, spaceApi]);
 
   const getPrinterList = async (page: number, pageSize: number) => {
+    console.log("========= getPrinterList   ==================", spaceApi);
+
     setLoading(true);
     try {
-      const res = await spaceApi?.listPrinters({ id: id });
-      setPrinterList(res ?? []);
+      // const res = await spaceApi?.listPrinters({ id: id });
+      const res = await axios.get(`${basePath}/spaces/${id}/printers`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      setPrinterList(res.data ?? []);
       setLoading(false);
     } catch (e) {
       setLoading(false);
