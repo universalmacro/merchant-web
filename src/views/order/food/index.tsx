@@ -141,10 +141,15 @@ const Tables = () => {
 
   const getPrinterList = async () => {
     try {
-      const res = await spaceApi?.listPrinters({ id: id });
-      if (res?.length > 0) {
+      // const res = await spaceApi?.listPrinters({ id: id });
+      const res = await axios.get(`${basePath}/spaces/${id}/printers`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      if (res?.data.length > 0) {
         let options: any = [];
-        res?.map((e: any) => {
+        res?.data.map((e: any) => {
           options.push({ value: e?.id, label: e?.name, ...e });
         });
         console.log(res, options);
@@ -198,10 +203,21 @@ const Tables = () => {
   const onUpdatePrinter = async (values: any) => {
     console.log("onUpdate", values);
     try {
-      const res = await orderApi.updateFoodPrinters({
-        id: values.id,
-        requestBody: [...values],
-      });
+      // const res = await orderApi.updateFoodPrinters({
+      //   id: values.id,
+      //   requestBody: [...values],
+      // });
+      const res = await axios.put(
+        `${basePath}/spaces/foods/${values?.id}/printers`,
+
+        { printerIds: [...values?.printers] },
+
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
     } catch (e) {}
     setPrinterVisible(false);
   };
@@ -234,15 +250,15 @@ const Tables = () => {
     try {
       const res = await orderApi?.listFoodPrinters({ id: record?.id });
       if (res) {
-        let data = res?.map((item: string, index: number) => {
-          return {
-            key: index,
-            name: item,
-          };
-        });
+        // let data = res?.map((item: string, index: number) => {
+        //   return {
+        //     key: index,
+        //     name: item,
+        //   };
+        // });
         let options: any = [];
         res?.map((e: any) => {
-          options.push({ value: e, label: e });
+          options.push({ value: e.id, label: e.name });
         });
         console.log(options);
         setPrinterValue({ id: record?.id, printers: options });
