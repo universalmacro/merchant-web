@@ -14,6 +14,7 @@ import {
 import { CommonTable } from "@macro-components/common-components";
 import { defaultImage } from "../../../utils/constant";
 import PrinterModalForm from "./printer-modal-form";
+import axios from "axios";
 
 const paginationConfig = {
   pageSize: 10,
@@ -76,7 +77,7 @@ const Tables = () => {
       getCategoryList();
       getPrinterList();
     }
-  }, [userToken, basePath, orderApi]);
+  }, [userToken, basePath, orderApi, spaceApi]);
 
   const onChangePage = (page: number, pageSize: number) => {
     getFoodList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
@@ -89,10 +90,16 @@ const Tables = () => {
     };
     setLoading(true);
     try {
-      const res = await orderApi?.listFoods({ id: id, ...pagination });
-      setFoodList(res ?? []);
+      // const res = await orderApi?.listFoods({ id: id, ...pagination });
+      const res = await axios.get(`${basePath}/spaces/${id}/foods`, {
+        params: { ...pagination },
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      setFoodList(res.data ?? []);
       let filters: any = [];
-      res?.categories?.map((e: any) => {
+      res.data?.categories?.map((e: any) => {
         filters.push({ text: e, value: e });
       });
       setTagFilters(filters);
@@ -106,16 +113,21 @@ const Tables = () => {
   const getCategoryList = async () => {
     setLoading(true);
     try {
-      const res = await orderApi?.listFoodCategories({ id: id });
-      if (res?.length > 0) {
-        let data = res?.map((item: string, index: number) => {
+      // const res = await orderApi?.listFoodCategories({ id: id });
+      const res = await axios.get(`${basePath}/spaces/${id}/foods/categories`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      if (res?.data?.length > 0) {
+        let data = res?.data.map((item: string, index: number) => {
           return {
             key: index,
             name: item,
           };
         });
         let options: any = [];
-        res?.map((e: any) => {
+        res?.data?.map((e: any) => {
           options.push({ value: e, label: e });
         });
         console.log(options);

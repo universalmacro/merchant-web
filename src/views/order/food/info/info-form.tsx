@@ -34,7 +34,8 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
         options: item?.options?.map((o: any) => ({ ...o, extra: o.extra / 100 })),
       })),
     };
-    console.log("=================transformPriceValue", transformPriceValue);
+    setAttributes(transformPriceValue?.attributes);
+    setImageUrl(state?.image ?? "");
     setDefaultValue(transformPriceValue);
   }, [state?.id]);
 
@@ -62,58 +63,40 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
       setImageLoading(true);
       return;
     }
-    if (info.file.status === "done") {
-      console.log(
-        "handleImageChangehandleImageChangehandleImageChangehandleImageChangehandleImageChange",
-        info.file.originFileObj
-      );
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj as RcFile, (url) => {
-        setImageLoading(false);
-        setImageUrl(url);
-      });
-    }
+    // if (info.file.status === "done") {
+    //   // setImageLoading(false);
+    //   // Get this url from response in real world.
+    //   getBase64(info.file.originFileObj as RcFile, (url) => {
+    //     setImageLoading(false);
+    //     setImageUrl(url);
+    //   });
+    // }
   };
 
-  const onUpload = async ({
-    action,
-    data,
-    file,
-    filename,
-    headers,
-    onError,
-    onProgress,
-    onSuccess,
-    withCredentials,
-  }: any) => {
-    console.log("dfdfdfdfdfd", file, data);
+  const onUpload = async ({ data, file, filename, onSuccess }: any) => {
     if (!state?.id) {
       return;
     }
     setImageLoading(true);
     const config = {
-      headers: { contentType: "multipart/form-data", Authorization: `Bearer ${userToken}` },
+      // headers: getHeaders(),
+      headers: {
+        // contentType: "multipart/form-data; boundary=<calculated when request is sent>",
+        Authorization: `Bearer ${userToken}`,
+      },
     };
     const formData = new FormData();
-    if (data) {
-      Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
-      });
-    }
-    formData.append(filename, file);
+    formData.append("file", file);
+    console.log(formData, file, filename);
 
     try {
-      const res = await axios.put(
-        `${basePath}/spaces/foods/${state?.id}/image`,
-        {
-          file: formData,
-        },
-        config
-      );
+      const res = await axios.put(`${basePath}/spaces/foods/${state?.id}/image`, formData, config);
       onSuccess(res, file);
       setImageLoading(false);
+      setImageUrl(res?.data?.image);
     } catch (e) {
       console.log(e);
+      setImageLoading(false);
     }
   };
 
@@ -128,7 +111,7 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
 
   const getHeaders = () => {
     return {
-      "Content-Type": "application/json;charset=UTF-8",
+      ContentType: "application/json;charset=UTF-8",
       Authorization: `Bearer ${userToken}`,
     };
   };
@@ -138,12 +121,12 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
       const values = await form.validateFields();
       let params = {
         ...values,
-        categories: [values?.categories],
+        categories: [values?.categories].flat(),
         description: values?.description ?? "",
         status:
           values.status === true || values.status === "AVAILABLE" ? "AVAILABLE" : "UNAVAILABLE",
-        images: imageUrl ?? "",
-        price: values.price,
+        image: imageUrl ?? "",
+        price: values?.price,
         attributes: filterAttr(),
       };
       console.log(params);
@@ -256,23 +239,25 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
               className="bg-gray-300"
             />
           </Form.Item>
-          <Form.Item label="圖片">
-            <Upload
-              name="data"
-              listType="picture-card"
-              className="avatar-uploader"
-              showUploadList={false}
-              customRequest={onUpload}
-              beforeUpload={beforeUpload}
-              onChange={handleImageChange}
-            >
-              {imageUrl ? (
-                <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
-              ) : (
-                uploadButton
-              )}
-            </Upload>
-          </Form.Item>
+          {state?.id && (
+            <Form.Item label="圖片">
+              <Upload
+                name="data"
+                listType="picture-card"
+                className="avatar-uploader"
+                showUploadList={false}
+                customRequest={onUpload}
+                beforeUpload={beforeUpload}
+                onChange={handleImageChange}
+              >
+                {imageUrl ? (
+                  <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+                ) : (
+                  uploadButton
+                )}
+              </Upload>
+            </Form.Item>
+          )}
           <EditAttribute
             initValues={defaultValue?.attributes}
             onChange={(values: any) => {
