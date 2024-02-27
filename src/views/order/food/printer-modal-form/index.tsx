@@ -36,7 +36,6 @@ const PrinterModalForm: React.FC<TableModalFormProps> = ({
         form
           .validateFields()
           .then((values) => {
-            form.resetFields();
             onSave({ ...values, id: state.id });
           })
           .catch((info) => {
