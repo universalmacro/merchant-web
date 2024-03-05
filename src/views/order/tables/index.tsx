@@ -6,6 +6,7 @@ import ModalForm from "./modal-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { OrderApi, Configuration, ConfigurationParameters } from "@universalmacro/merchant-ts-sdk";
 import { CommonTable } from "@macro-components/common-components";
+import axios from "axios";
 const paginationConfig = {
   pageSize: 10,
   page: 0,
@@ -58,8 +59,14 @@ const Tables = () => {
     console.log("------------------", orderApi, basePath, userToken);
     setLoading(true);
     try {
-      const res = await orderApi?.listTables({ id: id });
-      setTableList(res ?? []);
+      // const res = await orderApi?.listTables({ id: id });
+      const res = await axios.get(`${basePath}/spaces/${id}/tables`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      setTableList(res.data ?? []);
+      // setTableList(res ?? []);
       setLoading(false);
     } catch (e) {
       setLoading(false);
