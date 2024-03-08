@@ -305,19 +305,15 @@ const Tables = () => {
     },
     {
       title: "品項圖片",
-      dataIndex: "images",
-      render: (_: any, { images }: any) => (
+      dataIndex: "image",
+      render: (_: any, { image }: any) => (
         <img
           width="100"
           alt={
-            images?.[0]
-              ? `${images?.[0]}?imageView2/1/w/268/q/85`
-              : `${defaultImage}?imageView2/1/w/268/q/85`
+            image ? `${image}?imageView2/1/w/268/q/85` : `${defaultImage}?imageView2/1/w/268/q/85`
           }
           src={
-            images?.[0]
-              ? `${images?.[0]}?imageView2/1/w/268/q/85`
-              : `${defaultImage}?imageView2/1/w/268/q/85`
+            image ? `${image}?imageView2/1/w/268/q/85` : `${defaultImage}?imageView2/1/w/268/q/85`
           }
         />
       ),

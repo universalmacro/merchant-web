@@ -59,12 +59,12 @@ const Tables = () => {
     console.log("------------------", orderApi, basePath, userToken);
     setLoading(true);
     try {
-      // const res = await orderApi?.listTables({ id: id });
-      const res = await axios.get(`${basePath}/spaces/${id}/tables`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
+      const res = await orderApi?.listTables({ id: id });
+      // const res = await axios.get(`${basePath}/spaces/${id}/tables`, {
+      //   headers: {
+      //     Authorization: `Bearer ${userToken}`,
+      //   },
+      // });
       setTableList(res.data ?? []);
       // setTableList(res ?? []);
       setLoading(false);
