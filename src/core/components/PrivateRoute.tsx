@@ -7,7 +7,6 @@ import { Modal } from "antd";
 import axios from "axios";
 
 import { AppDispatch } from "../../store";
-import { getSpaceList } from "features/space/spaceActions";
 import { logout } from "../../features/auth/authSlice";
 
 const PrivateRoute = ({ children }: any) => {
@@ -50,6 +49,12 @@ const PrivateRoute = ({ children }: any) => {
       getSpaceList();
     }
   }, [basePath]);
+
+  // useEffect(() => {
+  //   if (userToken && !userInfo?.id) {
+  //     dispatch(userInfoAuth({ token: userToken }));
+  //   }
+  // }, [userInfo?.id]);
 
   useEffect(() => {
     if (error && !userInfo?.id) {
