@@ -70,7 +70,7 @@ export const userInfoAuth = createAsyncThunk(
 		let infoResponse = null;
 		try {
 			if(token){
-				infoResponse = await axios.get(`${basePath}/admins/self`, { headers: {Authorization: `Bearer ${token}`}});
+				infoResponse = await axios.get(`${basePath}/merchants/self`, { headers: {Authorization: `Bearer ${token}`}});
 			}
 			// get userInfo 
 			return {info: infoResponse?.data};

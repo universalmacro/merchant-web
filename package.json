@@ -20,7 +20,7 @@
     "@types/react-dom": "^18.2.18",
     "@universalmacro/auth-ts-sdk": "^0.0.3-alpha.2",
     "@universalmacro/core-ts-sdk": "^0.0.6-alpha.41",
-    "@universalmacro/merchant-ts-sdk": "^0.0.3-alpha.73",
+    "@universalmacro/merchant-ts-sdk": "^0.0.3-alpha.86",
     "antd": "^5.12.8",
     "apexcharts": "^3.35.5",
     "axios": "^0.27.2",

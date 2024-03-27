@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import Row from "./rows";
 import type { ColumnsType } from "antd/es/table";
+import axios from "axios";
 
 const paginationConfig = {
   pageSize: 10,
@@ -61,9 +62,14 @@ const Tables = () => {
 
   const update = async (categorylist: string[]) => {
     try {
-      const res = await orderApi.updateFoodCategories({
-        id: id,
-        requestBody: categorylist,
+      // const res = await orderApi.updateFoodCategories({
+      //   id: id,
+      //   requestBody: categorylist,
+      // });
+      const res = await axios.put(`${basePath}/spaces/${id}/foods/categories`, categorylist, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
       });
       getCategoryList(paginationConfig?.page, paginationConfig?.pageSize);
       updateSuccess();
@@ -97,7 +103,13 @@ const Tables = () => {
   const getCategoryList = async (page: number, pageSize: number) => {
     setLoading(true);
     try {
-      const res = await orderApi?.listFoodCategories({ id: id });
+      // const res = await orderApi?.listFoodCategories({ id: id });
+      const response = await axios.get(`${basePath}/spaces/${id}/foods/categories`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
+      const res = response.data;
       if (res?.length > 0) {
         let data = res?.map((item: string, index: number) => {
           return {
@@ -148,9 +160,15 @@ const Tables = () => {
       list = [...new Set(list)];
     }
     try {
-      const res = await orderApi.updateFoodCategories({
-        id: id,
-        requestBody: list,
+      // const res = await orderApi.updateFoodCategories({
+      //   id: id,
+      //   requestBody: list,
+      // });
+
+      const res = await axios.put(`${basePath}/spaces/${id}/foods/categories`, list, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
       });
       successCallback();
       getCategoryList(paginationConfig?.page, paginationConfig?.pageSize);

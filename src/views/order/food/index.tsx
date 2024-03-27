@@ -173,12 +173,23 @@ const Tables = () => {
   const onCreate = async (values: any) => {
     console.log("onCreate", values, id);
     try {
-      const res = await orderApi.createFood({
-        id: id,
-        saveFoodRequest: {
+      // const res = await orderApi.createFood({
+      //   id: id,
+      //   saveFoodRequest: {
+      //     ...values,
+      //   },
+      // });
+      const res = await axios.post(
+        `${basePath}/spaces/${id}/foods`,
+        {
           ...values,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
       successCallback();
       getFoodList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}

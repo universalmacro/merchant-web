@@ -59,12 +59,12 @@ const Tables = () => {
     console.log("------------------", orderApi, basePath, userToken);
     setLoading(true);
     try {
-      const res = await orderApi?.listTables({ id: id });
-      // const res = await axios.get(`${basePath}/spaces/${id}/tables`, {
-      //   headers: {
-      //     Authorization: `Bearer ${userToken}`,
-      //   },
-      // });
+      // const res = await orderApi?.listTables({ id: id });
+      const res = await axios.get(`${basePath}/spaces/${id}/tables`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
       setTableList(res.data ?? []);
       // setTableList(res ?? []);
       setLoading(false);
@@ -100,12 +100,23 @@ const Tables = () => {
   const onSave = async (values: any) => {
     console.log("onsave", values);
     try {
-      const res = await orderApi.createTable({
-        id: id,
-        saveTableRequest: {
+      // const res = await orderApi.createTable({
+      //   id: id,
+      //   saveTableRequest: {
+      //     label: values?.label,
+      //   },
+      // });
+      const res = await axios.post(
+        `${basePath}/spaces/${id}/tables`,
+        {
           label: values?.label,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
       successCallback();
       getTableList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}
