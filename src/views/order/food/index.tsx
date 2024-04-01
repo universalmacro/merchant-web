@@ -353,7 +353,7 @@ const Tables = () => {
       dataIndex: "price",
       key: "price",
       width: "10%",
-      render: (text: number, record: any) => <>${text}</>,
+      render: (text: number, record: any) => <>${record?.price / 100}</>,
     },
     {
       title: "服務費",
