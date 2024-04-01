@@ -29,11 +29,13 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
   useEffect(() => {
     let transformPriceValue = {
       ...state,
+      price: state?.price / 100,
       attributes: state?.attributes?.map((item: any) => ({
         ...item,
         options: item?.options?.map((o: any) => ({ ...o, extra: o.extra / 100 })),
       })),
     };
+    console.log("================", record, transformPriceValue);
     setAttributes(transformPriceValue?.attributes);
     setImageUrl(state?.image ?? "");
     setDefaultValue(transformPriceValue);
@@ -126,7 +128,7 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
         status:
           values.status === true || values.status === "AVAILABLE" ? "AVAILABLE" : "UNAVAILABLE",
         image: imageUrl ?? "",
-        price: values?.price,
+        price: values?.price * 100,
         attributes: filterAttr(),
       };
       console.log(params);
