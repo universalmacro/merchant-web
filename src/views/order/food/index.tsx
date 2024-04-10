@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Table, Button, Modal, Tag } from "antd";
+import { Table, Button, Modal, Tag, Upload } from "antd";
 // import ModalForm from "./modal-form";
 import ModalForm from "./info/info-form";
+import { UploadOutlined } from "@ant-design/icons";
 
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -15,6 +16,7 @@ import { CommonTable } from "@macro-components/common-components";
 import { defaultImage } from "../../../utils/constant";
 import PrinterModalForm from "./printer-modal-form";
 import axios from "axios";
+import ExportBtn from "components/export-btn";
 
 const paginationConfig = {
   pageSize: 10,
@@ -252,6 +254,7 @@ const Tables = () => {
   };
 
   const editFood = (record: any) => {
+    console.log("=========edit", record);
     setFoodValue(record);
     setVisible(true);
   };
@@ -318,15 +321,19 @@ const Tables = () => {
       title: "品項圖片",
       dataIndex: "image",
       render: (_: any, { image }: any) => (
-        <img
-          width="100"
-          alt={
-            image ? `${image}?imageView2/1/w/268/q/85` : `${defaultImage}?imageView2/1/w/268/q/85`
-          }
-          src={
-            image ? `${image}?imageView2/1/w/268/q/85` : `${defaultImage}?imageView2/1/w/268/q/85`
-          }
-        />
+        <div style={{ maxHeight: "100px", overflow: "hidden" }}>
+          <img
+            width="100"
+            max-height="100"
+            object-fit="cover"
+            alt={
+              image ? `${image}?imageView2/1/w/268/q/85` : `${defaultImage}?imageView2/1/w/268/q/85`
+            }
+            src={
+              image ? `${image}?imageView2/1/w/268/q/85` : `${defaultImage}?imageView2/1/w/268/q/85`
+            }
+          />
+        </div>
       ),
     },
     {
@@ -442,6 +449,7 @@ const Tables = () => {
           <span className="mr-4 cursor-pointer text-blue-400" onClick={() => editPrinter(record)}>
             打印機
           </span>
+          <ExportBtn record={record} />
         </>
       ),
     },
@@ -468,6 +476,30 @@ const Tables = () => {
         }}
       />
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
+        <Upload
+          accept=".json, .txt"
+          showUploadList={false}
+          beforeUpload={(file) => {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+              console.log(e.target.result);
+              let jsonContent = JSON.parse(e.target.result.toString());
+              setFoodValue(jsonContent);
+              setVisible(true);
+            };
+            reader.readAsText(file);
+
+            // Prevent upload
+            return false;
+          }}
+        >
+          <Button style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <UploadOutlined />
+            點擊上傳
+          </Button>
+        </Upload>
+
         <div>
           <CommonTable
             title="FOOD列表"
