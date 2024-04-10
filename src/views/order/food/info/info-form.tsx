@@ -137,6 +137,7 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
       } else {
         onSave(params);
       }
+      form.resetFields();
     } catch (errorInfo) {
       console.log("Failed:", errorInfo);
     }
@@ -253,7 +254,11 @@ const InfoForm = ({ record, state, visible, onSave, onCancel, categoryOptions }:
                 onChange={handleImageChange}
               >
                 {imageUrl ? (
-                  <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+                  <img
+                    src={imageUrl}
+                    alt="avatar"
+                    style={{ width: "100%", maxHeight: "100%", objectFit: "cover" }}
+                  />
                 ) : (
                   uploadButton
                 )}

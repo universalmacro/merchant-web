@@ -44,9 +44,12 @@ const PrivateRoute = ({ children }: any) => {
   };
 
   useEffect(() => {
-    if (userToken && !basePath) {
-      dispatch(userBasePath({}));
-      getSpaceList();
+    if (userToken) {
+      if (!basePath) {
+        dispatch(userBasePath({}));
+      } else {
+        getSpaceList();
+      }
     }
   }, [basePath]);
 
@@ -57,7 +60,8 @@ const PrivateRoute = ({ children }: any) => {
   // }, [userInfo?.id]);
 
   useEffect(() => {
-    if (error && !userInfo?.id) {
+    if (error) {
+      //&& !userInfo?.id
       errorCallback(error);
     }
   }, [error]);
