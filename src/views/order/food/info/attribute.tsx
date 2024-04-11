@@ -83,10 +83,9 @@ const EditAttribute = ({ initValues, onChange }: any) => {
                   </Form.Item>
                 </Card>
                 <DownCircleOutlined
+                  className="mr-4"
                   onClick={() => {
                     move(field.name, field.name + 1);
-                    console.log("================onFormChange", form.getFieldsValue()?.items);
-
                     onChange(form.getFieldsValue()?.items);
                   }}
                 />
