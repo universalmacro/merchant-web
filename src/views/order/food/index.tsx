@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Table, Button, Modal, Tag, Upload } from "antd";
+import { Table, Button, Modal, Tag, Upload, message } from "antd";
 // import ModalForm from "./modal-form";
 import ModalForm from "./info/info-form";
 import { UploadOutlined } from "@ant-design/icons";
@@ -18,6 +18,7 @@ import { defaultImage } from "../../../utils/constant";
 import PrinterModalForm from "./printer-modal-form";
 import axios from "axios";
 import ExportBtn from "components/export-btn";
+import { convertItemData } from "utils/utils";
 
 const paginationConfig = {
   pageSize: 10,
@@ -41,6 +42,8 @@ const Tables = () => {
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [printerOptions, setPrinterOptions] = useState([]);
   const [spaceApi, setSpaceApi] = useState(null);
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   const { confirm } = Modal;
 
@@ -167,6 +170,13 @@ const Tables = () => {
     });
   };
 
+  const success = () => {
+    messageApi.open({
+      type: "success",
+      content: "創建成功",
+    });
+  };
+
   const errorCallback = (e: any) => {
     Modal.error({
       content: `${e}`,
@@ -193,13 +203,14 @@ const Tables = () => {
           },
         }
       );
-      successCallback();
+      success();
       getFoodList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}
     setVisible(false);
   };
 
-  const onImport = async (items: Food[]) => {
+  const onImport = async (items: any[]) => {
+    setLoading(true);
     try {
       for await (const item of items) {
         const res = await axios.post(
@@ -215,8 +226,9 @@ const Tables = () => {
         );
       }
 
-      successCallback();
+      success();
       getFoodList(paginationConfig?.page, paginationConfig?.pageSize);
+      setLoading(false);
     } catch (e) {}
     setVisible(false);
   };
@@ -493,6 +505,8 @@ const Tables = () => {
 
   return (
     <div>
+      {contextHolder}
+
       <ModalForm
         categoryOptions={categoryOptions}
         state={foodValue}
@@ -537,52 +551,55 @@ const Tables = () => {
         </Upload> */}
 
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
-        <Upload
-          accept=".json, .txt"
-          showUploadList={false}
-          beforeUpload={(file) => {
-            const reader = new FileReader();
+        <div className="mt-5 flex">
+          <Upload
+            accept=".json, .txt"
+            showUploadList={false}
+            beforeUpload={(file) => {
+              const reader = new FileReader();
 
-            reader.onload = (e) => {
-              let jsonContent = JSON.parse(e.target.result.toString());
-              if (!Array.isArray(jsonContent)) {
-                jsonContent = [jsonContent];
-              }
-              let items = jsonContent?.map((item: Food) => {
-                return {
-                  name: item?.name ?? "",
-                  status: item?.status ?? "AVAILABLE",
-                  description: item?.description ?? "",
-                  fixedOffset: item?.fixedOffset,
-                  price: item?.price ?? 0,
-                  image: item?.image ?? "",
-                  categories: item?.categories,
-                  attributes: item?.attributes ?? [],
-                };
-              });
+              reader.onload = (e) => {
+                let jsonContent = JSON.parse(e.target.result.toString());
+                if (!Array.isArray(jsonContent)) {
+                  jsonContent = [jsonContent];
+                }
 
-              console.log(items);
-              showImportConfirm(function () {
-                onImport(items);
-              }, items.length);
+                // 新舊數據格式轉換
+                // let items = convertItemData(jsonContent);
 
-              // setFoodValue(jsonContent);
-              // setVisible(true);
-            };
-            reader.readAsText(file);
+                let items = jsonContent?.map((item: Food) => {
+                  return {
+                    name: item?.name ?? "",
+                    status: item?.status ?? "AVAILABLE",
+                    description: item?.description ?? "",
+                    fixedOffset: item?.fixedOffset,
+                    price: item?.price ?? 0,
+                    image: item?.image ?? "",
+                    categories: item?.categories,
+                    attributes: item?.attributes ?? [],
+                  };
+                });
 
-            // Prevent upload
-            return false;
-          }}
-        >
-          <div className="mt-5 flex">
+                showImportConfirm(function () {
+                  onImport(items);
+                }, items.length);
+
+                // setFoodValue(jsonContent);
+                // setVisible(true);
+              };
+              reader.readAsText(file);
+
+              // Prevent upload
+              return false;
+            }}
+          >
             <Button className="mr-4 flex items-center justify-center">
               <UploadOutlined />
               上傳
             </Button>
-            <ExportBtn record={tableList} />
-          </div>
-        </Upload>
+          </Upload>
+          <ExportBtn record={tableList} />
+        </div>
 
         {/* <Button style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <ExportOutlined />
