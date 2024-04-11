@@ -40,7 +40,7 @@ const ModalForm: React.FC<TableModalFormProps> = ({ state, visible, onSave, onCa
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
           name="name"
-          label="名稱"
+          label="名稱 (可以使用中英文逗號，空格分割)"
           rules={[
             {
               required: true,
