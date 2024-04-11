@@ -11,6 +11,7 @@ import {
   SpaceApi,
   Configuration,
   ConfigurationParameters,
+  Food,
 } from "@universalmacro/merchant-ts-sdk";
 import { CommonTable } from "@macro-components/common-components";
 import { defaultImage } from "../../../utils/constant";
@@ -198,6 +199,28 @@ const Tables = () => {
     setVisible(false);
   };
 
+  const onImport = async (items: Food[]) => {
+    try {
+      for await (const item of items) {
+        const res = await axios.post(
+          `${basePath}/spaces/${id}/foods`,
+          {
+            ...item,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+      }
+
+      successCallback();
+      getFoodList(paginationConfig?.page, paginationConfig?.pageSize);
+    } catch (e) {}
+    setVisible(false);
+  };
+
   const onUpdate = async (values: any) => {
     console.log("onUpdate", values);
 
@@ -238,6 +261,19 @@ const Tables = () => {
   const showDeleteConfirm = (onOk: any) => {
     confirm({
       title: "確認刪除？",
+      okText: "確認",
+      okType: "danger",
+      cancelText: "取消",
+      onOk,
+      onCancel() {
+        console.log("OK");
+      },
+    });
+  };
+
+  const showImportConfirm = (onOk: any, num: number) => {
+    confirm({
+      title: `確認導入${num}條數據？`,
       okText: "確認",
       okType: "danger",
       cancelText: "取消",
@@ -449,7 +485,7 @@ const Tables = () => {
           <span className="mr-4 cursor-pointer text-blue-400" onClick={() => editPrinter(record)}>
             打印機
           </span>
-          <ExportBtn record={record} />
+          {/* <ExportBtn record={record} /> */}
         </>
       ),
     },
@@ -475,7 +511,7 @@ const Tables = () => {
           setPrinterVisible(false);
         }}
       />
-      <div className="mt-5 grid h-full grid-cols-1 gap-5">
+      {/* <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <Upload
           accept=".json, .txt"
           showUploadList={false}
@@ -498,7 +534,56 @@ const Tables = () => {
             <UploadOutlined />
             點擊上傳
           </Button>
+        </Upload> */}
+
+      <div className="mt-5 grid h-full grid-cols-1 gap-5">
+        <Upload
+          accept=".json, .txt"
+          showUploadList={false}
+          beforeUpload={(file) => {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+              let jsonContent = JSON.parse(e.target.result.toString());
+              let items = jsonContent.map((item: Food) => {
+                return {
+                  name: item?.name ?? "",
+                  status: item?.status ?? "AVAILABLE",
+                  description: item?.description ?? "",
+                  fixedOffset: item?.fixedOffset,
+                  price: item?.price ?? 0,
+                  image: item?.image ?? "",
+                  categories: item?.categories,
+                };
+              });
+
+              console.log(items);
+              showImportConfirm(function () {
+                onImport(items);
+              }, items.length);
+
+              // setFoodValue(jsonContent);
+              // setVisible(true);
+            };
+            reader.readAsText(file);
+
+            // Prevent upload
+            return false;
+          }}
+        >
+          <div className="mt-5 flex">
+            <Button className="mr-4 flex items-center justify-center">
+              <UploadOutlined />
+              上傳
+            </Button>
+            <ExportBtn record={tableList} />
+          </div>
         </Upload>
+
+        {/* <Button style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <ExportOutlined />
+          導出
+        </Button> */}
 
         <div>
           <CommonTable
