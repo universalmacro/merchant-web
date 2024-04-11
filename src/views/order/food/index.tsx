@@ -545,7 +545,10 @@ const Tables = () => {
 
             reader.onload = (e) => {
               let jsonContent = JSON.parse(e.target.result.toString());
-              let items = jsonContent.map((item: Food) => {
+              if (!Array.isArray(jsonContent)) {
+                jsonContent = [jsonContent];
+              }
+              let items = jsonContent?.map((item: Food) => {
                 return {
                   name: item?.name ?? "",
                   status: item?.status ?? "AVAILABLE",
@@ -554,6 +557,7 @@ const Tables = () => {
                   price: item?.price ?? 0,
                   image: item?.image ?? "",
                   categories: item?.categories,
+                  attributes: item?.attributes ?? [],
                 };
               });
 
