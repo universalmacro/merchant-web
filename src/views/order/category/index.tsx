@@ -154,17 +154,19 @@ const Tables = () => {
     console.log("onsave", values?.name, categoryList, tableValue, values);
     let list = [...categoryList];
     if (tableValue?.id === undefined) {
-      list = [...new Set([values?.name, ...categoryList])];
+      let arr = values.name.replace(/\"/g, "").split(/,|，|\s+/);
+      list = [...new Set([...arr, ...categoryList])];
     } else {
       list.splice(values?.id, 1, values.name);
       list = [...new Set(list)];
     }
+
+    console.log(list);
     try {
       // const res = await orderApi.updateFoodCategories({
       //   id: id,
       //   requestBody: list,
       // });
-
       const res = await axios.put(`${basePath}/spaces/${id}/foods/categories`, list, {
         headers: {
           Authorization: `Bearer ${userToken}`,

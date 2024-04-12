@@ -2,8 +2,18 @@ import React, { useEffect, useState } from "react";
 import { CloseOutlined, DownCircleOutlined } from "@ant-design/icons";
 import { Button, Card, Form, Input, InputNumber, Space, Typography } from "antd";
 
+function isRepeat(arr: any) {
+  var hash = new Map();
+  for (var i in arr) {
+    if (hash.get(arr[i]) != null) return true;
+    hash.set(arr[i], true);
+  }
+  return false;
+}
+
 const EditAttribute = ({ initValues, onChange }: any) => {
   const [form] = Form.useForm();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (initValues) {
@@ -14,7 +24,15 @@ const EditAttribute = ({ initValues, onChange }: any) => {
   useEffect(() => form.resetFields(), [initValues]);
 
   const onFormChange = () => {
-    onChange(form.getFieldsValue()?.items);
+    const items = form.getFieldsValue()?.items;
+    items?.forEach((item: any) => {
+      let labels = item?.options?.map((i: any) => i?.label);
+      console.log(labels);
+      if (isRepeat(labels)) setError("存在重複項！");
+      else setError(null);
+    });
+    onChange(items);
+    // onChange(form.getFieldsValue()?.items);
   };
 
   return (
@@ -28,7 +46,21 @@ const EditAttribute = ({ initValues, onChange }: any) => {
       initialValues={{ items: initValues ?? [{}] }}
       onChange={onFormChange}
     >
-      <Form.List name="items">
+      <Form.List
+        name="items"
+        rules={[
+          {
+            validator: async (_, items) => {
+              console.log(items);
+              items.forEach((item: any) => {
+                let labels = item.options.map((i: any) => i.label);
+                console.log(labels);
+                if (isRepeat(labels)) return Promise.reject(new Error("存在重複選項"));
+              });
+            },
+          },
+        ]}
+      >
         {(fields, { add, remove, move }) => (
           <div style={{ display: "flex", rowGap: 16, flexDirection: "column" }}>
             {fields.map((field) => (
@@ -49,6 +81,7 @@ const EditAttribute = ({ initValues, onChange }: any) => {
                     />
                   }
                 >
+                  {error && <div className="text-red-800"> {error}</div>}
                   <Form.Item label="屬性名稱" name={[field.name, "label"]}>
                     <Input />
                   </Form.Item>
