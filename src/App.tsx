@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate, useRoutes } from "react-router-dom";
 import PrivateRoute from "./core/components/PrivateRoute";
-// import AuthGuard from "auth/AuthGuard";
 
 import RtlLayout from "layouts/rtl";
 import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import ItemInfo from "views/info/ItemInfo";
 import CommonLayout from "layouts/common";
+import CommonMenuLayout from "layouts/commonmenu";
 
 const App = () => {
   return (
@@ -30,10 +30,28 @@ const App = () => {
       />
 
       <Route
+        path="order/*"
+        element={
+          <PrivateRoute>
+            <AdminLayout />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
         path="spaces/:id/order/*"
         element={
           <PrivateRoute>
             <CommonLayout />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="spaces/:id/menu/*"
+        element={
+          <PrivateRoute>
+            <CommonMenuLayout />
           </PrivateRoute>
         }
       />

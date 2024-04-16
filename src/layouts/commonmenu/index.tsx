@@ -1,14 +1,24 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate, useLocation, useParams, useNavigate } from "react-router-dom";
-import { spaceRoutes } from "routes";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useParams,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { orderRoutes } from "routes";
 
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined, ShoppingOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
+import { Breadcrumb, Layout, Menu, theme, Button, Drawer, Badge } from "antd";
+import Food from "../../views/menu/food";
 
 const { Header, Content, Sider, Footer } = Layout;
 
-const items3: MenuProps["items"] = spaceRoutes.map((item, index) => {
+const items3: MenuProps["items"] = orderRoutes.map((item, index) => {
   return {
     key: item.key,
     icon: item.icon,
@@ -25,21 +35,33 @@ const items3: MenuProps["items"] = spaceRoutes.map((item, index) => {
 });
 
 const domain = "/spaces/";
-const subPath = "/order/";
+const subPath = "/menu/";
 
 export default function Config(props: { [x: string]: any }) {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const [collapsed, setCollapsed] = useState(false);
-
+  const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("table");
   const [currentRouteName, setCurrentRouteName] = React.useState("餐桌");
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [amount, setAmount] = useState(0);
 
   const { id } = useParams();
+  const [table, setTable] = useState(location?.state?.record);
+
+  const [breadItems, setBreadItems] = React.useState([
+    {
+      title: <a href="/">{id}</a>,
+    },
+    {
+      title: <a href={`/spaces/${id}/menu/table`}>{table?.label}</a>,
+    },
+  ]);
 
   const onClickMenu = (route: any) => {
     navigate(domain + id + subPath + route.key);
@@ -51,10 +73,23 @@ export default function Config(props: { [x: string]: any }) {
     );
   }, []);
   React.useEffect(() => {
-    getActiveRoute(spaceRoutes);
-  }, [location.pathname]);
+    getActiveRoute(orderRoutes);
+    setTable(location?.state?.record);
+  }, [location.pathname, location?.state]);
+
+  React.useEffect(() => {
+    setBreadItems([
+      {
+        title: <a href="/">{id}</a>,
+      },
+      {
+        title: <a href={`/spaces/${id}/menu/table`}>{location?.state?.record?.label}</a>,
+      },
+    ]);
+  }, [table]);
 
   const getActiveRoute = (routesConfig: any): string => {
+    console.log(window.location.href);
     let activeRoute = "table";
     for (let j = 0; j < routesConfig?.length; j++) {
       if (routesConfig?.[j]?.component) {
@@ -142,26 +177,42 @@ export default function Config(props: { [x: string]: any }) {
           />
         </Sider>
 
-        <Layout style={{ marginLeft: 200 }}>
+        <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
           <Header style={{ padding: 0, background: colorBgContainer }}>
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              style={{
-                fontSize: "16px",
-                width: 64,
-                height: 64,
-              }}
-            />
+            <div className="flex justify-between">
+              <Button
+                type="text"
+                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={() => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: "16px",
+                  width: 64,
+                  height: 64,
+                }}
+              />
+              {table?.id && (
+                <div className="mr-8 cursor-pointer">
+                  <Badge count={amount} showZero>
+                    <ShoppingOutlined
+                      size={200}
+                      // className="mr-8 cursor-pointer"
+                      style={{ fontSize: "22px" }}
+                      onClick={() => {
+                        setShowDrawer(true);
+                      }}
+                    />
+                  </Badge>
+                </div>
+              )}
+            </div>
           </Header>
-          <Breadcrumb style={{ margin: "16px" }}>
-            <Breadcrumb.Item href="/">首页</Breadcrumb.Item>
+          <Breadcrumb style={{ margin: "16px" }} items={breadItems} />
+          {/* <Breadcrumb.Item href="/admin/nodes">點餐</Breadcrumb.Item>
             <Breadcrumb.Item>{currentRouteName}</Breadcrumb.Item>
-          </Breadcrumb>
+          </Breadcrumb> */}
           <Content
             style={{
-              margin: "24px 16px 0",
+              margin: "0px 16px 0",
               overflow: "initial",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
@@ -174,11 +225,21 @@ export default function Config(props: { [x: string]: any }) {
                 // borderRadius: borderRadiusLG,
               }}
             >
-              <Routes>
-                {getRoutes(spaceRoutes)}
+              {table?.id ? (
+                <>
+                  <Food
+                    showDrawer={showDrawer}
+                    onCloseDrawer={() => setShowDrawer(false)}
+                    setAmount={setAmount}
+                  />
+                </>
+              ) : (
+                <Routes>
+                  {getRoutes(orderRoutes)}
 
-                <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
-              </Routes>
+                  <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
+                </Routes>
+              )}
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
