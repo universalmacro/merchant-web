@@ -2,10 +2,9 @@ import React from "react";
 
 // Admin Imports
 import SystemTables from "views/admin/system";
-import AdminTables from "views/admin/manage";
-import NodeTables from "views/admin/nodes";
-import Profile from "views/admin/profile";
+import OrderTables from "views/admin/order";
 import SpaceTable from "views/order/tables";
+import MenuTable from "views/menu/tables";
 import SpaceFood from "views/order/food";
 import SpaceCategory from "views/order/category";
 import SpacePrinter from "views/order/printer";
@@ -14,7 +13,7 @@ import SpacePrinter from "views/order/printer";
 import SignIn from "views/auth/SignIn";
 
 // Icon Imports
-import { MdBarChart, MdLock, MdPeopleAlt } from "react-icons/md";
+import { MdBarChart, MdLock, MdOutlineRestaurant } from "react-icons/md";
 import { FaShareNodes } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 
@@ -33,6 +32,13 @@ const routes = [
     icon: <MdBarChart className="h-6 w-6" />,
     path: "manage",
     component: <SystemTables />,
+  },
+  {
+    name: "系统点餐",
+    layout: "/admin",
+    icon: <MdOutlineRestaurant className="h-6 w-6" />,
+    path: "order",
+    component: <OrderTables />,
   },
   {
     name: "Sign In",
@@ -100,6 +106,24 @@ const spaceRoutes: Array<{
     ],
   },
 ];
+
+const orderRoutes: Array<{
+  name: string;
+  key: string;
+  icon: any;
+  children?: RoutesType[];
+  component?: any;
+  path?: string;
+}> = [
+  {
+    name: "選擇餐桌",
+    icon: <TableOutlined />,
+    path: "table",
+    key: "table",
+    component: <MenuTable />,
+  },
+];
+
 export default routes;
 
-export { spaceRoutes };
+export { spaceRoutes, orderRoutes };
