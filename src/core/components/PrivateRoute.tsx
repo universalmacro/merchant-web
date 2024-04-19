@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { userBasePath, userInfoAuth } from "../../features/auth/authActions";
+import { userBasePath, userInfoAuth, userSpace } from "../../features/auth/authActions";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Modal } from "antd";
 import axios from "axios";
@@ -46,9 +46,10 @@ const PrivateRoute = ({ children }: any) => {
   useEffect(() => {
     if (userToken) {
       if (!basePath) {
-        dispatch(userBasePath({}));
+        dispatch(userBasePath({ token: userToken }));
       } else {
-        getSpaceList();
+        // getSpaceList();
+        // dispatch(userSpace({ token: userToken, url: basePath }));
       }
     }
   }, [basePath]);

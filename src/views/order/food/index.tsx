@@ -164,12 +164,6 @@ const Tables = () => {
     } catch (e) {}
   };
 
-  const successCallback = () => {
-    Modal.success({
-      content: "創建成功！",
-    });
-  };
-
   const success = () => {
     messageApi.open({
       type: "success",

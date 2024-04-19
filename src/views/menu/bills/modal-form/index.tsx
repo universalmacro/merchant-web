@@ -1,28 +1,21 @@
 import { useEffect } from "react";
-import { Modal, Form, Input } from "antd";
+import { Modal, Form, InputNumber } from "antd";
+import { SpaceTable } from "types/food";
 
-interface ModalFormProps {
-  state: any;
+interface TableModalFormProps {
   visible: boolean;
-  onSave: (values: any) => void;
+  onSave: (table: SpaceTable) => void;
   onCancel: () => void;
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
+const ModalForm: React.FC<TableModalFormProps> = ({ visible, onSave, onCancel }) => {
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    form.setFieldsValue({
-      name: state.name,
-      description: state.description,
-    });
-  }, [state?.name]);
 
   return (
     <Modal
       open={visible}
-      title="新增/編輯"
-      okText="確認"
+      title="輸入金額"
+      okText="確認打印"
       cancelText="取消"
       onCancel={onCancel}
       onOk={() => {
@@ -30,7 +23,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onSave({ ...values, id: state.id });
+            onSave({ ...values });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -39,19 +32,16 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
     >
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
-          name="name"
-          label="空間名稱"
+          name="amount"
+          label="金額"
           rules={[
             {
               required: true,
-              message: "請輸入空間名稱",
+              message: "請輸入訂單金額",
             },
           ]}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item name="description" label="描述">
-          <Input />
+          <InputNumber />
         </Form.Item>
       </Form>
     </Modal>
