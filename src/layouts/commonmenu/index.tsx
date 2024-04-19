@@ -10,7 +10,6 @@ import {
 } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { orderRoutes } from "routes";
-
 import { MenuFoldOutlined, MenuUnfoldOutlined, ShoppingOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Breadcrumb, Layout, Menu, theme, Button, Drawer, Badge } from "antd";
@@ -41,22 +40,29 @@ export default function Config(props: { [x: string]: any }) {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const { spaces, userToken, basePath } = useSelector((state: any) => state.auth) || [];
+
   const [collapsed, setCollapsed] = useState(false);
-  const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [open, setOpen] = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("table");
-  const [currentRouteName, setCurrentRouteName] = React.useState("餐桌");
   const [showDrawer, setShowDrawer] = useState(false);
+  const [spaceName, setSpaceName] = useState("");
   const [amount, setAmount] = useState(0);
 
   const { id } = useParams();
   const [table, setTable] = useState(location?.state?.record);
+  const [order, setOrder] = useState(location?.state?.order);
+
+  const getSpaceName = (id: string) => {
+    if (!id) return "";
+    let name = spaces.filter((item: any) => item.id === id)?.[0]?.name ?? "";
+    setSpaceName(name);
+  };
 
   const [breadItems, setBreadItems] = React.useState([
     {
-      title: <a href="/">{id}</a>,
+      title: <a href="/">{spaceName}</a>,
     },
     {
       title: <a href={`/spaces/${id}/menu/table`}>{table?.label}</a>,
@@ -68,48 +74,37 @@ export default function Config(props: { [x: string]: any }) {
   };
 
   React.useEffect(() => {
-    window.addEventListener("resize", () =>
-      window.innerWidth < 1200 ? setOpen(false) : setOpen(true)
-    );
-  }, []);
+    getActiveRoute(orderRoutes);
+    setTable(location?.state?.record);
+    setOrder(location?.state?.order);
+  }, [location.pathname, location?.state, id]);
+
   React.useEffect(() => {
     getActiveRoute(orderRoutes);
     setTable(location?.state?.record);
-  }, [location.pathname, location?.state]);
+    if (id && basePath && userToken) {
+      getSpaceName(id);
+    }
+  }, [id, basePath, userToken]);
 
   React.useEffect(() => {
     setBreadItems([
       {
-        title: <a href="/">{id}</a>,
+        title: <a href="/">{spaceName}</a>,
       },
       {
         title: <a href={`/spaces/${id}/menu/table`}>{location?.state?.record?.label}</a>,
       },
     ]);
-  }, [table]);
+  }, [table, spaceName]);
 
   const getActiveRoute = (routesConfig: any): string => {
-    console.log(window.location.href);
     let activeRoute = "table";
     for (let j = 0; j < routesConfig?.length; j++) {
-      if (routesConfig?.[j]?.component) {
-        if (window.location.href.indexOf("/" + id + subPath + routesConfig?.[j].path) !== -1) {
-          setCurrentRoute(routesConfig?.[j].key);
-        }
-      } else {
-        let routes = routesConfig?.[j].children;
-        for (let i = 0; i < routes?.length; i++) {
-          if (
-            window.location.href.indexOf(routes[i].layout + "/" + id + subPath + routes[i].path) !==
-            -1
-          ) {
-            setCurrentRoute(routes[i].path);
-            setCurrentRouteName(routes[i].name);
-          }
-        }
+      if (window.location.href.indexOf("/" + id + subPath + routesConfig?.[j].path) !== -1) {
+        setCurrentRoute(routesConfig?.[j].key);
       }
     }
-
     return activeRoute;
   };
 
@@ -169,8 +164,9 @@ export default function Config(props: { [x: string]: any }) {
           <Menu
             theme="dark"
             mode="inline"
-            // selectedKeys={[currentRoute]}
-            defaultOpenKeys={["order"]}
+            selectedKeys={[currentRoute]}
+            // defaultSelectedKeys={[currentRoute]}
+            // defaultOpenKeys={["table"]}
             style={{ borderRight: 0 }}
             items={items3}
             onClick={onClickMenu}
@@ -191,18 +187,25 @@ export default function Config(props: { [x: string]: any }) {
                 }}
               />
               {table?.id && (
-                <div className="mr-8 cursor-pointer">
-                  <Badge count={amount} showZero>
-                    <ShoppingOutlined
-                      size={200}
-                      // className="mr-8 cursor-pointer"
-                      style={{ fontSize: "22px" }}
-                      onClick={() => {
-                        setShowDrawer(true);
-                      }}
-                    />
-                  </Badge>
-                </div>
+                <>
+                  {order?.id && (
+                    <div>
+                      <Button danger>{order?.id} 加单中</Button>
+                    </div>
+                  )}
+                  <div className="mr-8 cursor-pointer">
+                    <Badge count={amount} showZero>
+                      <ShoppingOutlined
+                        size={200}
+                        // className="mr-8 cursor-pointer"
+                        style={{ fontSize: "22px" }}
+                        onClick={() => {
+                          setShowDrawer(true);
+                        }}
+                      />
+                    </Badge>
+                  </div>
+                </>
               )}
             </div>
           </Header>
@@ -228,6 +231,7 @@ export default function Config(props: { [x: string]: any }) {
               {table?.id ? (
                 <>
                   <Food
+                    table={table}
                     showDrawer={showDrawer}
                     onCloseDrawer={() => setShowDrawer(false)}
                     setAmount={setAmount}

@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { Table, List, Tabs, Radio, Modal, Tag, Flex, message, Drawer, Space, Button } from "antd";
+import { List, Tabs, Radio, Modal, Tag, Flex, message, Drawer, Space, Button, Divider } from "antd";
 // import ModalForm from "./modal-form";
 import ModalForm from "./info/info-form";
 import { UploadOutlined } from "@ant-design/icons";
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   OrderApi,
   SpaceApi,
@@ -14,6 +14,7 @@ import {
   Food,
   Spec,
   FoodSpec,
+  Table,
 } from "@universalmacro/merchant-ts-sdk";
 import { CommonTable } from "@macro-components/common-components";
 import { defaultImage } from "../../../utils/constant";
@@ -22,7 +23,7 @@ import axios from "axios";
 import FoodCard from "./food-card";
 import AttributeModal from "./attribute-modal";
 import ShoppingCartCard from "./shoppingcart-card";
-import { MapToPair, OptionEqual } from "utils/utils";
+import { MapEqual, MapToPair, OptionEqual, PairToMap, getCart, getPricing } from "utils/utils";
 
 const paginationConfig = {
   pageSize: 10,
@@ -37,13 +38,14 @@ export interface CartItem {
 
 interface FoodProps {
   showDrawer: boolean;
+  table: Table;
   setAmount?: (amount: number) => void;
   onClick?: () => void;
   onCancel?: () => void;
   onCloseDrawer?: () => void;
 }
 
-const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) => {
+const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount, table }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { userToken, basePath } =
@@ -62,16 +64,18 @@ const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) =
   const [printerOptions, setPrinterOptions] = useState([]);
   const [spaceApi, setSpaceApi] = useState(null);
   const [food, setFood] = useState(null);
-
+  const location = useLocation();
   const [messageApi, contextHolder] = message.useMessage();
 
-  // 提交訂單用
-  const [foods, setFoods] = useState([]);
-  // 購物車用
-  const [cart, setCart] = useState([]);
   const [orders, setOrders] = useState<FoodSpec[]>([]);
 
+  const [previousOrder, setPreviousOrder] = useState(location?.state?.order);
+
   const { confirm } = Modal;
+
+  const cartOrders = useMemo(() => {
+    return getCart(orders, []);
+  }, [orders]);
 
   useEffect(() => {
     if (isNaN(Number(id))) {
@@ -122,7 +126,6 @@ const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) =
     };
     setLoading(true);
     try {
-      // const res = await orderApi?.listFoods({ id: id, ...pagination });
       const res = await axios.get(`${basePath}/spaces/${id}/foods`, {
         params: { ...pagination },
         headers: {
@@ -142,7 +145,64 @@ const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) =
     }
   };
 
-  const onSubmit = () => {};
+  const showError = (text: string) => {
+    messageApi.open({
+      type: "error",
+      content: text,
+    });
+  };
+
+  const onSubmit = async () => {
+    onCloseDrawer();
+    if (!previousOrder?.id) {
+      try {
+        const res = await axios.post(
+          `${basePath}/spaces/${id}/orders`,
+          {
+            tableLabel: table.label,
+            foods: orders,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+
+        if (res) {
+          setOrders([]);
+          navigate(`/spaces/${id}/menu/bill`);
+          // showBillConfirm(() => {});
+        }
+      } catch (e) {
+        console.log(e);
+        showError(e.toString());
+      }
+    } else {
+      // 存在已有訂單，加單
+      try {
+        const res = await axios.put(
+          `${basePath}/orders/${previousOrder?.id}/addition`,
+          {
+            foods: orders,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          }
+        );
+
+        if (res) {
+          setOrders([]);
+          navigate(`/spaces/${id}/menu/bill`);
+        }
+      } catch (e) {
+        console.log(e);
+        showError(e.toString());
+      }
+    }
+  };
 
   const getCategoryList = async () => {
     setLoading(true);
@@ -287,9 +347,9 @@ const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) =
     });
   };
 
-  const showImportConfirm = (onOk: any, num: number) => {
+  const showBillConfirm = (onOk: any) => {
     confirm({
-      title: `確認導入${num}條數據？`,
+      title: `打印訂單？`,
       okText: "確認",
       okType: "danger",
       cancelText: "取消",
@@ -325,32 +385,29 @@ const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) =
     setFoodList(filterTable);
   };
 
-  // const onSaveAttribute = (item: any) => {
-  //   console.log("onSaveAttributeonSaveAttribute", item);
-  //   if (cart.length == 0) {
-  //     cart.push({ ...item, amount: 1 });
-  //   } else {
-  //     cart?.map((i: any, index: number) => {
-  //       if (i?.food.id === item?.food.id) {
-  //         // 同屬性
-  //         if (OptionEqual(i?.spec, item?.spec)) {
-  //           cart[index].amount += 1;
-  //         } else {
-  //           cart.push({ ...item, amount: 1 });
-  //         }
-  //       } else {
-  //         cart.push({ ...item, amount: 1 });
-  //       }
-  //     });
-  //   }
-
-  //   setCart(cart);
-  // };
-
   const onSaveAttribute = (item: Food, selectedOptions: Map<string, string>) => {
+    setOrders([...orders, { food: item, spec: MapToPair(selectedOptions) }]);
+  };
+
+  const removeCart = (item: Food, options: Map<string, string>) => {
+    console.log(item, options);
+    let index = -1;
+    orders.forEach((order, i) => {
+      if (order.food.id === item.id && MapEqual(PairToMap(order.spec), options)) {
+        index = i;
+      }
+    });
+    setOrders(orders.filter((_, i) => i !== index));
+  };
+
+  const pushCart = (item: Food, selectedOptions: Map<string, string>) => {
     // setSelectingSpecificationsItem(undefined);
     setOrders([...orders, { food: item, spec: MapToPair(selectedOptions) }]);
   };
+
+  const total = useMemo(() => {
+    return orders.reduce((total, order) => total + getPricing(order), 0);
+  }, [orders]);
 
   return (
     <div>
@@ -417,24 +474,35 @@ const Tables: React.FC<FoodProps> = ({ showDrawer, onCloseDrawer, setAmount }) =
         />
       </div>
       <Drawer
-        title={`購物車`}
+        title={previousOrder?.id ? `購物車 ( 添加到訂單 ${previousOrder?.id})` : `購物車`}
         placement="right"
-        // size={"large"}
         onClose={onCloseDrawer}
         open={showDrawer}
         width={640}
-        extra={
-          <Space>
-            <Button type="primary" onClick={onSubmit}>
-              提交
-            </Button>
-          </Space>
-        }
       >
-        <div>
-          {cart?.map((item: CartItem) => {
-            return <ShoppingCartCard item={item} />;
-          })}
+        <div className="flex h-[100%] flex-col justify-between">
+          <div>
+            {cartOrders.map((item, index) => {
+              return (
+                <ShoppingCartCard
+                  item={item}
+                  removeCart={() => removeCart(item.order.food, PairToMap(item.order.spec))}
+                  pushCart={pushCart}
+                />
+              );
+            })}
+          </div>
+          <div className="">
+            <Divider />
+            <p className="mb-4 flex justify-between text-lg">
+              總價：<span className="text-red-500">${total / 100}</span>
+            </p>
+            <Space className="mb-4 flex items-center">
+              <Button type="primary" onClick={onSubmit} className="w-[580px] bg-orange-300">
+                提交
+              </Button>
+            </Space>
+          </div>
         </div>
       </Drawer>
     </div>

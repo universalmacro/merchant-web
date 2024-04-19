@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { userLogin, userInfoAuth, userBasePath } from "./authActions";
+import { userLogin, userInfoAuth, userBasePath, userSpace } from "./authActions";
 
 // initialize userToken from local storage
 const userToken = localStorage.getItem('merchant-web-token')
@@ -12,6 +12,7 @@ const initialState = {
   userToken, // for storing the JWT
   basePath: null,
   error: null,
+  spaces: [],
   success: false, // for monitoring the registration process.
 } as any;
 
@@ -27,6 +28,7 @@ const authSlice = createSlice({
       state.userInfo = null;
       state.userToken = null;
       state.error = null;
+      state.spaces = [];
     },
   },
   extraReducers: (builder: any) => {
@@ -57,6 +59,7 @@ const authSlice = createSlice({
       .addCase(userBasePath.fulfilled, (state: any, { payload }: any) => {
         state.loading = false;
         state.basePath = payload.basePath;
+        state.spaces = payload.spaces;
         return state;
       })
       .addCase(userBasePath.rejected, (state: any, { payload }: any) => {
@@ -79,7 +82,23 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = payload;
         return state;
-      })
+      });
+      // builder
+      // .addCase(userSpace.pending, (state: any, { payload }: any) => {
+      //   state.loading = true;
+      //   state.error = null;
+      //   return state;
+      // })
+      // .addCase(userSpace.fulfilled, (state: any, { payload }: any) => {
+      //   state.loading = false;
+      //   state.spaces = payload?.spaces;
+      //   return state;
+      // })
+      // .addCase(userSpace.rejected, (state: any, { payload }: any) => {
+      //   state.loading = false;
+      //   state.error = payload;
+      //   return state;
+      // })
   }
 } as any);
 

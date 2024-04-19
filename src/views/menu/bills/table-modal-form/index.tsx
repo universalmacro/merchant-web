@@ -1,27 +1,21 @@
 import { useEffect } from "react";
-import { Modal, Form, Input } from "antd";
+import { Modal, Form, Select } from "antd";
+import { SpaceTable } from "types/food";
 
-interface ModalFormProps {
-  state: any;
+interface TableModalFormProps {
+  options: any[];
   visible: boolean;
-  onSave: (values: any) => void;
+  onSave: (table: SpaceTable) => void;
   onCancel: () => void;
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
+const TableModalForm: React.FC<TableModalFormProps> = ({ options, visible, onSave, onCancel }) => {
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    form.setFieldsValue({
-      name: state.name,
-      description: state.description,
-    });
-  }, [state?.name]);
 
   return (
     <Modal
       open={visible}
-      title="新增/編輯"
+      title="更換訂單桌號"
       okText="確認"
       cancelText="取消"
       onCancel={onCancel}
@@ -30,7 +24,8 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onSave({ ...values, id: state.id });
+            onSave(values);
+            // onSave({ ...values, id: state.id });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -39,23 +34,20 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
     >
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
-          name="name"
-          label="空間名稱"
+          name="label"
+          label="餐桌名稱"
           rules={[
             {
               required: true,
-              message: "請輸入空間名稱",
+              message: "請選擇",
             },
           ]}
         >
-          <Input />
-        </Form.Item>
-        <Form.Item name="description" label="描述">
-          <Input />
+          <Select style={{ width: 120 }} options={options} />
         </Form.Item>
       </Form>
     </Modal>
   );
 };
 
-export default ModalForm;
+export default TableModalForm;

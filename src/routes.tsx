@@ -5,6 +5,7 @@ import SystemTables from "views/admin/system";
 import OrderTables from "views/admin/order";
 import SpaceTable from "views/order/tables";
 import MenuTable from "views/menu/tables";
+import BillTable from "views/menu/bills";
 import SpaceFood from "views/order/food";
 import SpaceCategory from "views/order/category";
 import SpacePrinter from "views/order/printer";
@@ -13,7 +14,7 @@ import SpacePrinter from "views/order/printer";
 import SignIn from "views/auth/SignIn";
 
 // Icon Imports
-import { MdBarChart, MdLock, MdOutlineRestaurant } from "react-icons/md";
+import { MdBarChart, MdLock, MdOutlineRestaurant, MdOutlineTableBar } from "react-icons/md";
 import { FaShareNodes } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 
@@ -117,10 +118,17 @@ const orderRoutes: Array<{
 }> = [
   {
     name: "選擇餐桌",
-    icon: <TableOutlined />,
+    icon: <MdOutlineTableBar />,
     path: "table",
     key: "table",
     component: <MenuTable />,
+  },
+  {
+    name: "所有訂單",
+    icon: <TableOutlined />,
+    path: "bill",
+    key: "bill",
+    component: <BillTable />,
   },
 ];
 

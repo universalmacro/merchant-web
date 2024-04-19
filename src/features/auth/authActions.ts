@@ -40,7 +40,7 @@ export const userLogin = createAsyncThunk(
 
 export const userBasePath = createAsyncThunk(
 	'auth/url',
-	async ({ }: any, { rejectWithValue }) => {
+	async ({ token }: any, { rejectWithValue }) => {
     let host = window.location.host;
     if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       // localhost 測試環境發送請求會報錯
@@ -48,11 +48,36 @@ export const userBasePath = createAsyncThunk(
     } 
 		try {
       const res = await axios.get(`${basePath}/nodes/config/api?domain=${host}`);
-	  console.log("<<<<<<<<<<<<<<<<<<<<<<userBasePath:", res);
       if(res && res?.data){
         let url = res?.data?.merchantUrl;
-        return { basePath: url};
+        let spaces = [];
+        try {
+          // get space
+          const res = await axios.get(`${url}/spaces`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: {
+              index: 0,
+              limit: 10,
+            },
+          });
+          if(res){
+            spaces = res?.data?.items;
+          }
+        } catch (error: any) {
+          // return custom error message from API if any
+          if (error.response && error.response.data.message) {
+            return rejectWithValue(error.response.data.message);
+          } else {
+            return rejectWithValue(error.message);
+          }
+        }
+        // return {spaces: res?.data?.items};
+
+        return { basePath: url, spaces: spaces};
       }
+      
 		} catch (error: any) {
 			// return custom error message from API if any
 			if (error.response && error.response.data.message) {
@@ -63,6 +88,34 @@ export const userBasePath = createAsyncThunk(
 		}
 	}
 );
+
+
+export const userSpace = createAsyncThunk(
+	'auth/space',
+	async ({ token, url }: any, { rejectWithValue }) => {
+		try {
+			// get space
+      const res = await axios.get(`${url}/spaces`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          index: 0,
+          limit: 10,
+        },
+      });
+			return {spaces: res?.data?.items};
+		} catch (error: any) {
+			// return custom error message from API if any
+			if (error.response && error.response.data.message) {
+				return rejectWithValue(error.response.data.message);
+			} else {
+				return rejectWithValue(error.message);
+			}
+		}
+	}
+);
+
 
 export const userInfoAuth = createAsyncThunk(
 	'auth/info',

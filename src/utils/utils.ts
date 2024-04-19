@@ -207,7 +207,7 @@ export function OptionEqual(m: Spec[] | undefined, m2: Spec[] | undefined) {
 }
 
 export function getCart(orders: FoodSpec[], cartOrders: CartOrder[] = []): CartOrder[] {
-  if (orders.length === 0) return cartOrders;
+  if (!orders || orders?.length === 0) return cartOrders;
   const [order] = orders;
   const amount = orders.filter(
     (o) => o.food.id === order.food.id && OptionEqual(o.spec, order.spec)
@@ -224,3 +224,4 @@ export function getCart(orders: FoodSpec[], cartOrders: CartOrder[] = []): CartO
   ];
   return getCart(tail, newCartOrders);
 }
+

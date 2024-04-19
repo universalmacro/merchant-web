@@ -14,6 +14,7 @@ import {
   SpaceApi,
 } from "@universalmacro/merchant-ts-sdk";
 import { CommonTable } from "@macro-components/common-components";
+import axios from "axios";
 const paginationConfig = {
   pageSize: 10,
   page: 0,
@@ -110,12 +111,24 @@ const Tables = () => {
   const onSave = async (values: any) => {
     console.log("onsave", values);
     try {
-      const res = await spaceApi.createSpace({
-        saveSpaceRequest: {
+      // const res = await spaceApi.createSpace({
+      //   saveSpaceRequest: {
+      //     name: values?.name,
+      //     description: values?.description ?? "",
+      //   },
+      // });
+      const res = await axios.post(
+        `${basePath}/spaces`,
+        {
           name: values?.name,
           description: values?.description ?? "",
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
       successCallback();
       getSpaceList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}
@@ -125,13 +138,25 @@ const Tables = () => {
   const onUpdate = async (values: any) => {
     console.log(values);
     try {
-      const res = await spaceApi.updateSpace({
-        id: values.id,
-        saveSpaceRequest: {
+      // const res = await spaceApi.updateSpace({
+      //   id: values.id,
+      //   saveSpaceRequest: {
+      //     name: values?.name,
+      //     description: values?.description ?? "",
+      //   },
+      // });
+      const res = await axios.put(
+        `${basePath}/spaces/${values.id}`,
+        {
           name: values?.name,
           description: values?.description ?? "",
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
       getSpaceList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}
     setVisible(false);
